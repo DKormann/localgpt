@@ -54,10 +54,15 @@ while intake:
     bot_response = ''
     try:
       for chunk in resp:
-        print(chunk, end='')
-        bot_response += chunk
+        colors = ['\033[36m', '\033[35m']
+        for i, line in enumerate(chunk.split("\n")):
+          if i > 0: line = '\n' + line
+          bot_response += line
+          if not (bot_response.split('\n')[-1]).startswith('`'):
+            print(colors[bot_response.count('\n```') % 2]+line, end='')
+
     except KeyboardInterrupt: pass
     hist.append({'role':'assistant', 'content':bot_response})
     print("\033[0m")
   with open(hist_path, "w") as f: json.dump(hist, f, indent=2)
-  intake = input("You: ")
+  intake = input(("[enter 'run' to execute code] " if '```' in hist[-1]['content'] else "") + "You: ")
